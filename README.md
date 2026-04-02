@@ -223,8 +223,7 @@ MIT — Use livremente!
 ## 👨‍💻 Autor
 
 Mateus Rodrigues Reis  
-📧 Contato: [seu email aqui]  
-🔗 GitHub: [seu github aqui]
+📧 Contato: mateusccontatoprofissional@gmail.com
 
 ---
 
