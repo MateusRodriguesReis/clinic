@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ClínicaDB — Entrar</title>
+<link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ── LEFT ── -->
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-logo">🏥</div>
+      <h1>ClínicaDB</h1>
+      <p>Portal do Paciente — acesse seus agendamentos e histórico médico com segurança.</p>
+    </div>
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">📅</div>
+        <div class="feature-text"><h4>Agende Consultas</h4><p>Escolha médico, data e horário</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📋</div>
+        <div class="feature-text"><h4>Seu Histórico</h4><p>Prontuários e consultas anteriores</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-text"><h4>Seguro e Privado</h4><p>Apenas você acessa seus dados</p></div>
+      </div>
+    </div>
+    <div class="panel-footer">ClínicaDB · Projeto Portfólio · Oracle SQL + JS</div>
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="panel-right">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" id="tab-login"    onclick="switchTab('login')">Entrar</div>
+      <div class="tab"       id="tab-register"  onclick="switchTab('register')">Criar Conta</div>
+    </div>
+
+    <!-- ── LOGIN ── -->
+    <div class="form-section active" id="section-login">
+      <div class="form-title">Bem-vindo de volta 👋</div>
+      <div class="form-sub">Entre com seu e-mail e senha cadastrados</div>
+
+      <div class="alert" id="login-alert"></div>
+
+      <div class="form-group" style="margin-bottom:14px">
+        <label>E-mail</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="login-email" placeholder="seuemail@email.com" autocomplete="email"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="login-senha" placeholder="Sua senha" autocomplete="current-password"/>
+          <span class="toggle-pw" onclick="togglePw('login-senha', this)">👁️</span>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btn-login" onclick="doLogin()">
+        Entrar na minha conta →
+      </button>
+
+      <div class="divider"><span>ou acesse como</span></div>
+
+      <a class="admin-link" href="index.html">
+        🩺 Painel Médico / Administrativo
+      </a>
+    </div>
+
+    <!-- ── REGISTER ── -->
+    <div class="form-section" id="section-register">
+      <div class="form-title">Criar conta 🆕</div>
+      <div class="form-sub">Preencha seus dados para se cadastrar como paciente</div>
+
+      <div class="alert" id="reg-alert"></div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nome completo *</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input id="reg-nome" placeholder="Ex: João da Silva"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>CPF *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🪪</span>
+            <input id="reg-cpf" placeholder="000.000.000-00" maxlength="14"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Data de Nascimento *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🎂</span>
+            <input type="date" id="reg-nasc"/>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label>Sexo *</label>
+          <div class="sex-group">
+            <div class="sex-opt" data-val="M" onclick="selSex(this)">♂ Masculino</div>
+            <div class="sex-opt" data-val="F" onclick="selSex(this)">♀ Feminino</div>
+            <div class="sex-opt" data-val="O" onclick="selSex(this)">⚧ Outro</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Telefone</label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input id="reg-tel" placeholder="(21) 99000-0000"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>CEP</label>
+          <div class="input-wrap">
+            <span class="input-icon">📍</span>
+            <input id="reg-cep" placeholder="00000-000" maxlength="9"/>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label>E-mail *</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="reg-email" placeholder="seuemail@email.com"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Senha *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-senha" placeholder="Mín. 6 caracteres" oninput="checkStrength(this)"/>
+            <span class="toggle-pw" onclick="togglePw('reg-senha', this)">👁️</span>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar Senha *</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-senha2" placeholder="Repita a senha"/>
+            <span class="toggle-pw" onclick="togglePw('reg-senha2', this)">👁️</span>
+          </div>
+          <div class="field-error" id="err-senha2">As senhas não coincidem</div>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="doRegister()">
+        Criar minha conta ✓
+      </button>
+    </div>
+
+  </div><!-- /panel-right -->
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DB helpers (same as index.html)
+// ══════════════════════════════════════════════
+const DB = {
+  get(k)    { return JSON.parse(localStorage.getItem(k) || '[]'); },
+  set(k,v)  { localStorage.setItem(k, JSON.stringify(v)); },
+  nextId(k) { const r = JSON.parse(localStorage.getItem(k+'_seq') || '0') + 1; localStorage.setItem(k+'_seq', r); return r; }
+};
+
+// Seed if not yet seeded (in case user opens login before index)
+function seedIfEmpty() {
+  if (DB.get('seeded').length) return;
+  const esps = [
+    {id:1,nome:'Clínica Geral',   descricao:'Atendimento geral e triagem',               ativo:1},
+    {id:2,nome:'Cardiologia',     descricao:'Doenças do coração e sistema circulatório',  ativo:1},
+    {id:3,nome:'Dermatologia',    descricao:'Doenças da pele, cabelo e unhas',            ativo:1},
+    {id:4,nome:'Pediatria',       descricao:'Atendimento a crianças e adolescentes',      ativo:1},
+    {id:5,nome:'Ortopedia',       descricao:'Ossos, articulações e musculatura',          ativo:1},
+  ];
+  DB.set('especialidades', esps); localStorage.setItem('especialidades_seq','5');
+  const meds = [
+    {id:1,nome:'Dr. Carlos Lima',    crm:'CRM/RJ-12345',id_especialidade:1,telefone:'(21) 99001-1111',email:'carlos@clinica.com',ativo:1},
+    {id:2,nome:'Dra. Ana Ferreira',  crm:'CRM/RJ-23456',id_especialidade:2,telefone:'(21) 99001-2222',email:'ana@clinica.com',   ativo:1},
+    {id:3,nome:'Dr. Paulo Souza',    crm:'CRM/RJ-34567',id_especialidade:3,telefone:'(21) 99001-3333',email:'paulo@clinica.com', ativo:1},
+    {id:4,nome:'Dra. Mariana Costa', crm:'CRM/RJ-45678',id_especialidade:4,telefone:'(21) 99001-4444',email:'mariana@clinica.com',ativo:1},
+  ];
+  DB.set('medicos', meds); localStorage.setItem('medicos_seq','4');
+  
+  // Pacientes de teste
+  const pacs = [
+    {id:1,nome:'João Silva',      cpf:'111.222.333-44',data_nascimento:'1990-03-15',sexo:'M',telefone:'(21) 98000-0001',email:'joao@email.com',   endereco:'Rua das Flores, 100 — Madureira',   cep:'21300-000',data_cadastro:'2025-01-10'},
+    {id:2,nome:'Maria Oliveira',  cpf:'222.333.444-55',data_nascimento:'1985-07-22',sexo:'F',telefone:'(21) 98000-0002',email:'maria@email.com',  endereco:'Av. Brasil, 500 — Centro',          cep:'20900-000',data_cadastro:'2025-01-15'},
+    {id:3,nome:'Pedro Santos',    cpf:'333.444.555-66',data_nascimento:'2000-11-30',sexo:'M',telefone:'(21) 98000-0003',email:'pedro@email.com',  endereco:'Rua Uruguai, 40 — Tijuca',          cep:'20510-060',data_cadastro:'2025-02-03'},
+    {id:4,nome:'Luciana Rocha',   cpf:'444.555.666-77',data_nascimento:'1978-01-05',sexo:'F',telefone:'(21) 98000-0004',email:'luciana@email.com',endereco:'Rua Conde de Bonfim, 200 — Tijuca', cep:'20520-050',data_cadastro:'2025-02-20'},
+  ];
+  DB.set('pacientes', pacs); localStorage.setItem('pacientes_seq','4');
+  
+  // Consultas de teste
+  const cons = [
+    {id:1,id_paciente:1,id_medico:1,data_consulta:'2025-07-10',hora_consulta:'09:00',status:'REALIZADA', motivo:'Dor de cabeça frequente',  valor:150},
+    {id:2,id_paciente:2,id_medico:2,data_consulta:'2025-07-12',hora_consulta:'10:30',status:'REALIZADA', motivo:'Palpitações e cansaço',    valor:250},
+    {id:3,id_paciente:3,id_medico:1,data_consulta:'2025-07-15',hora_consulta:'14:00',status:'AGENDADA',  motivo:'Consulta de rotina',       valor:150},
+    {id:4,id_paciente:4,id_medico:3,data_consulta:'2025-07-16',hora_consulta:'11:00',status:'AGENDADA',  motivo:'Manchas na pele',          valor:200},
+    {id:5,id_paciente:1,id_medico:2,data_consulta:'2025-07-20',hora_consulta:'08:00',status:'CANCELADA', motivo:'Acompanhamento cardíaco',  valor:250},
+  ];
+  DB.set('consultas', cons); localStorage.setItem('consultas_seq','5');
+  
+  // Prontuários de teste
+  const pros = [
+    {id:1,id_consulta:1,diagnostico:'G43 — Enxaqueca sem aura',prescricao:'Dipirona 500mg — 1 comprimido a cada 6h por 3 dias',observacoes:'Paciente orientado a reduzir cafeína e manter hidratação.',data_registro:'2025-07-10'},
+    {id:2,id_consulta:2,diagnostico:'R00.0 — Taquicardia',     prescricao:'Atenolol 25mg — 1 comprimido em jejum por 30 dias', observacoes:'Solicitar ECG e Holter 24h. Retorno em 30 dias.',          data_registro:'2025-07-12'},
+  ];
+  DB.set('prontuarios', pros); localStorage.setItem('prontuarios_seq','2');
+  
+  // Autenticação de teste
+  const auths = [
+    {id_paciente:1, email:'joao@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))},
+    {id_paciente:2, email:'maria@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))},
+    {id_paciente:3, email:'pedro@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))},
+    {id_paciente:4, email:'luciana@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))}
+  ];
+  DB.set('pac_auth', auths);
+  
+  DB.set('pacientes',[]); localStorage.setItem('pacientes_seq','0');
+  DB.set('consultas',[]); localStorage.setItem('consultas_seq','0');
+  DB.set('prontuarios',[]); localStorage.setItem('prontuarios_seq','0');
+  DB.set('seeded',[1]);
+}
+
+// ══════════════════════════════════════════════
+//  AUTH helpers  (passwords stored as btoa — demo only)
+// ══════════════════════════════════════════════
+function hashPw(pw)   { return btoa(unescape(encodeURIComponent(pw))); }
+function getAuth()    { return DB.get('pac_auth'); }
+function findAuth(email) { return getAuth().find(a => a.email.toLowerCase() === email.toLowerCase()); }
+
+function saveAuth(id_paciente, email, senha) {
+  const auths = getAuth().filter(a => a.id_paciente !== id_paciente);
+  auths.push({ id_paciente, email: email.toLowerCase(), senha: hashPw(senha) });
+  DB.set('pac_auth', auths);
+}
+
+// ══════════════════════════════════════════════
+//  UI helpers
+// ══════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+function switchTab(tab) {
+  ['login','register'].forEach(t => {
+    $(  `tab-${t}`    ).classList.toggle('active', t===tab);
+    $(`section-${t}`  ).classList.toggle('active', t===tab);
+  });
+  hideAlert('login-alert'); hideAlert('reg-alert');
+}
+
+function togglePw(inputId, icon) {
+  const inp = $(inputId);
+  if (inp.type === 'password') { inp.type = 'text';     icon.textContent = '🙈'; }
+  else                         { inp.type = 'password'; icon.textContent = '👁️'; }
+}
+
+function showAlert(id, msg, type='error') {
+  const el = $(id); el.textContent = (type==='error'?'⚠️ ':'✅ ') + msg;
+  el.className = `alert show ${type}`;
+}
+function hideAlert(id) { $(id).className = 'alert'; }
+
+let selectedSex = '';
+function selSex(el) {
+  document.querySelectorAll('.sex-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedSex = el.dataset.val;
+}
+
+function checkStrength(inp) {
+  const v = inp.value;
+  let score = 0;
+  if (v.length >= 6)  score++;
+  if (v.length >= 10) score++;
+  if (/[A-Z]/.test(v)) score++;
+  if (/[0-9]/.test(v)) score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const colors = ['','#e53935','#f57c00','#fbc02d','#388e3c','#1b5e20'];
+  const fill = $('strength-fill');
+  fill.style.width = (score * 20) + '%';
+  fill.style.background = colors[score] || '#e53935';
+}
+
+// CPF mask
+$('reg-cpf').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'').slice(0,11);
+  if (v.length > 9) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+  else if (v.length > 6) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+  else if (v.length > 3) v = v.slice(0,3)+'.'+v.slice(3);
+  this.value = v;
+});
+
+// CEP mask
+$('reg-cep').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g,'').slice(0,8);
+  if (v.length > 5) v = v.slice(0,5)+'-'+v.slice(5);
+  this.value = v;
+});
+
+// ══════════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════════
+function doLogin() {
+  const email = $('login-email').value.trim();
+  const senha = $('login-senha').value;
+  hideAlert('login-alert');
+
+  if (!email || !senha) { showAlert('login-alert','Preencha e-mail e senha.'); return; }
+
+  const auth = findAuth(email);
+  if (!auth) { showAlert('login-alert','E-mail não cadastrado. Crie sua conta!'); return; }
+  if (auth.senha !== hashPw(senha)) { showAlert('login-alert','Senha incorreta.'); return; }
+
+  // Save session
+  localStorage.setItem('session_pac', JSON.stringify({ id: auth.id_paciente, email: auth.email }));
+  showAlert('login-alert', 'Login realizado! Redirecionando…', 'success');
+  setTimeout(() => window.location.href = 'paciente.html', 900);
+}
+
+$('login-senha').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+
+// ══════════════════════════════════════════════
+//  REGISTER
+// ══════════════════════════════════════════════
+function doRegister() {
+  hideAlert('reg-alert');
+  $('err-senha2').classList.remove('show');
+
+  const nome  = $('reg-nome').value.trim();
+  const cpf   = $('reg-cpf').value.trim();
+  const nasc  = $('reg-nasc').value;
+  const sexo  = selectedSex;
+  const tel   = $('reg-tel').value.trim();
+  const cep   = $('reg-cep').value.trim();
+  const email = $('reg-email').value.trim();
+  const senha = $('reg-senha').value;
+  const senha2= $('reg-senha2').value;
+
+  if (!nome||!cpf||!nasc||!sexo||!email||!senha) {
+    showAlert('reg-alert','Preencha todos os campos obrigatórios (*).');
+    return;
+  }
+  if (senha.length < 6) { showAlert('reg-alert','A senha precisa ter no mínimo 6 caracteres.'); return; }
+  if (senha !== senha2) { $('err-senha2').classList.add('show'); return; }
+
+  const pacs = DB.get('pacientes');
+  if (pacs.find(p => p.cpf === cpf)) { showAlert('reg-alert','CPF já cadastrado. Faça login!'); return; }
+  if (findAuth(email)) { showAlert('reg-alert','E-mail já cadastrado. Faça login!'); return; }
+
+  // INSERT INTO PACIENTE
+  const newId = DB.nextId('pacientes');
+  const novoPac = {
+    id: newId, nome, cpf, data_nascimento: nasc, sexo,
+    telefone: tel, email, endereco: '', cep,
+    data_cadastro: new Date().toISOString().slice(0,10)
+  };
+  pacs.push(novoPac);
+  DB.set('pacientes', pacs);
+
+  // Save auth
+  saveAuth(newId, email, senha);
+
+  // Auto login
+  localStorage.setItem('session_pac', JSON.stringify({ id: newId, email: email.toLowerCase() }));
+  showAlert('reg-alert', `Conta criada com sucesso! Bem-vindo(a), ${nome.split(' ')[0]}!`, 'success');
+  setTimeout(() => window.location.href = 'paciente.html', 1100);
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+seedIfEmpty();
+
+// If already logged in, redirect
+const sess = localStorage.getItem('session_pac');
+if (sess) window.location.href = 'paciente.html';
+</script>
+</body>
+</html>

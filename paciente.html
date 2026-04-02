@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ClínicaDB — Portal do Paciente</title>
+<link rel="stylesheet" href="css/paciente.css"/>
+</head>
+<body>
+
+<!-- ═══ TOP NAV ═══ -->
+<nav id="topnav">
+  <div class="nav-brand">
+    <span class="icon">🏥</span>
+    <div>
+      <h1>ClínicaDB</h1>
+      <span>Portal do Paciente</span>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" data-page="inicio"    onclick="goPage('inicio')">   🏠 Início   </div>
+    <div class="nav-tab"       data-page="agendar"   onclick="goPage('agendar')">  📅 Agendar Consulta </div>
+    <div class="nav-tab"       data-page="historico" onclick="goPage('historico')">📋 Meu Histórico</div>
+    <div class="nav-tab"       data-page="perfil"    onclick="goPage('perfil')">   👤 Meu Perfil</div>
+  </div>
+  <div class="nav-right">
+    <div class="user-pill" id="user-pill">
+      <div class="user-avatar" id="user-av">??</div>
+      <span class="user-name" id="user-name">Carregando…</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">Sair</button>
+  </div>
+</nav>
+
+<!-- ═══ CONTENT ═══ -->
+<div id="content">
+
+  <!-- ═══ INÍCIO ═══ -->
+  <div class="page active" id="page-inicio">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">📅 Minhas Próximas Consultas</div><div class="card-sub">Consultas agendadas</div></div>
+        <button class="btn btn-primary btn-small" onclick="goPage('agendar')">+ Agendar</button>
+      </div>
+      <div class="consult-list" id="upcoming-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══ AGENDAR ═══ -->
+  <div class="page" id="page-agendar">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">📅 Agendar Nova Consulta</div><div class="card-sub">Siga os passos abaixo</div></div>
+      </div>
+      <div class="agendar-wrap">
+
+        <!-- Step bar -->
+        <div class="step-bar">
+          <div class="step active" id="step-ind-1"><div class="step-circle">1</div><div class="step-label">Especialidade</div></div>
+          <div class="step"        id="step-ind-2"><div class="step-circle">2</div><div class="step-label">Médico</div></div>
+          <div class="step"        id="step-ind-3"><div class="step-circle">3</div><div class="step-label">Data & Hora</div></div>
+          <div class="step"        id="step-ind-4"><div class="step-circle">4</div><div class="step-label">Confirmação</div></div>
+        </div>
+
+        <!-- Step 1: Especialidade -->
+        <div class="step-content active" id="step-1">
+          <div class="step-title">Qual especialidade você precisa?</div>
+          <div class="options-grid" id="esp-options"></div>
+          <div class="step-nav">
+            <div></div>
+            <button class="btn btn-primary" onclick="nextStep(2)">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Médico -->
+        <div class="step-content" id="step-2">
+          <div class="step-title">Escolha o médico</div>
+          <div id="med-options" class="med-options-grid"></div>
+          <div class="step-nav">
+            <button class="btn btn-ghost" onclick="prevStep(1)">← Voltar</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Data e hora -->
+        <div class="step-content" id="step-3">
+          <div class="step-title">Escolha data e horário</div>
+          <div class="form-group form-group-narrow">
+            <label>Data da Consulta</label>
+            <input type="date" id="ag-data" oninput="renderHorarios()"/>
+          </div>
+          <div class="horarios-label">Horários disponíveis</div>
+          <div class="horarios-grid" id="horarios-grid"></div>
+          <div class="form-group">
+            <label>Motivo da Consulta</label>
+            <textarea id="ag-motivo" placeholder="Descreva brevemente o motivo…"></textarea>
+          </div>
+          <div class="step-nav">
+            <button class="btn btn-ghost" onclick="prevStep(2)">← Voltar</button>
+            <button class="btn btn-primary" onclick="nextStep(4)">Revisar →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Revisão -->
+        <div class="step-content" id="step-4">
+          <div class="step-title">Confirme sua consulta</div>
+          <div class="resumo-box" id="resumo-box"></div>
+          <div class="step-nav">
+            <button class="btn btn-ghost" onclick="prevStep(3)">← Voltar</button>
+            <button class="btn btn-success" onclick="confirmarConsulta()">✓ Confirmar Agendamento</button>
+          </div>
+        </div>
+
+        <!-- Success -->
+        <div class="step-content" id="step-success">
+          <div class="success-box">
+            <div class="success-icon">🎉</div>
+            <h2>Consulta Agendada!</h2>
+            <p>Sua consulta foi marcada com sucesso. Anote os detalhes abaixo.</p>
+            <div class="success-detail" id="success-detail"></div>
+            <button class="btn btn-primary" onclick="novoAgendamento()">Agendar outra consulta</button>
+            <button class="btn btn-ghost" onclick="goPage('historico')">Ver meu histórico</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ HISTÓRICO ═══ -->
+  <div class="page" id="page-historico">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">📋 Histórico de Consultas</div><div class="card-sub">Todas as suas consultas</div></div>
+        <select id="filter-hist" onchange="renderHistorico()" class="select-filter">
+          <option value="">Todos os status</option>
+          <option value="AGENDADA">Agendadas</option>
+          <option value="REALIZADA">Realizadas</option>
+          <option value="CANCELADA">Canceladas</option>
+        </select>
+      </div>
+      <div id="hist-list" class="consult-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PERFIL ═══ -->
+  <div class="page" id="page-perfil">
+    <div class="card">
+      <div class="card-header"><div class="card-title">👤 Meu Perfil</div></div>
+      <div class="perfil-wrap">
+        <div class="perfil-header">
+          <div class="perfil-avatar" id="perf-av">??</div>
+          <div>
+            <div class="perfil-name"  id="perf-nome">—</div>
+            <div class="perfil-email" id="perf-email">—</div>
+            <div class="perfil-since" id="perf-since">—</div>
+          </div>
+        </div>
+        <div class="perfil-grid" id="perfil-grid"></div>
+        <div class="password-section">
+          <div class="password-title">🔒 Alterar Senha</div>
+          <div class="password-grid">
+            <div class="form-group">
+              <label>Senha Atual</label>
+              <input type="password" id="pw-atual" placeholder="••••••"/>
+            </div>
+            <div class="form-group">
+              <label>Nova Senha</label>
+              <input type="password" id="pw-nova" placeholder="••••••"/>
+            </div>
+            <div class="form-group">
+              <label>Confirmar</label>
+              <input type="password" id="pw-conf" placeholder="••••••"/>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-save-password" onclick="alterarSenha()">Salvar Nova Senha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- Modal prontuário -->
+<div class="overlay" id="modal-pro">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📋 Prontuário Médico</h2>
+      <button class="modal-close" onclick="closeModal('modal-pro')">✕</button>
+    </div>
+    <div id="modal-pro-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DB / SESSION
+// ══════════════════════════════════════════════════
+const DB = {
+  get(k)    { return JSON.parse(localStorage.getItem(k) || '[]'); },
+  set(k,v)  { localStorage.setItem(k, JSON.stringify(v)); },
+  nextId(k) { const r = JSON.parse(localStorage.getItem(k+'_seq') || '0') + 1; localStorage.setItem(k+'_seq', r); return r; }
+};
+
+// Auth check
+const sessRaw = localStorage.getItem('session_pac');
+if (!sessRaw) { window.location.href = 'login.html'; }
+const session = JSON.parse(sessRaw || '{}');
+
+const $ = id => document.getElementById(id);
+
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+const fmtDate  = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+const initials = s => (s||'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const getEsp   = id => DB.get('especialidades').find(x=>x.id==id) || {};
+const getMed   = id => DB.get('medicos').find(x=>x.id==id) || {};
+const getMe    = ()  => DB.get('pacientes').find(p=>p.id===session.id) || {};
+const getAuth  = ()  => DB.get('pac_auth');
+
+function toast(msg, type='success') {
+  const t = $('toast'); t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 2800);
+}
+function closeModal(id) { $(id).classList.remove('open'); }
+
+function badgeHtml(status) {
+  const cls = {AGENDADA:'b-agendada',REALIZADA:'b-realizada',CANCELADA:'b-cancelada',FALTA:'b-falta'};
+  return `<span class="badge ${cls[status]||''}">${status}</span>`;
+}
+
+function dateBox(dateStr) {
+  const d = new Date(dateStr+'T12:00:00');
+  const day = d.getDate().toString().padStart(2,'0');
+  const mon = d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+  return `<div class="consult-date-box"><div class="day">${day}</div><div class="mon">${mon}</div></div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  NAV
+// ══════════════════════════════════════════════════
+function goPage(page) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id==='page-'+page));
+  if (page==='inicio')    renderInicio();
+  if (page==='historico') renderHistorico();
+  if (page==='perfil')    renderPerfil();
+  if (page==='agendar')   initAgendar();
+}
+
+// ══════════════════════════════════════════════════
+//  INÍCIO
+// ══════════════════════════════════════════════════
+function renderInicio() {
+  const me   = getMe();
+  const cons = DB.get('consultas').filter(c=>c.id_paciente===session.id);
+  const age  = cons.filter(c=>c.status==='AGENDADA');
+  const rea  = cons.filter(c=>c.status==='REALIZADA');
+  const pro  = DB.get('prontuarios').filter(p => cons.find(c=>c.id===p.id_consulta));
+
+  $('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-icon si-blue">📅</div><div><div class="stat-val">${age.length}</div><div class="stat-lbl">Consultas Agendadas</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-teal">✅</div><div><div class="stat-val">${rea.length}</div><div class="stat-lbl">Realizadas</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-green">📋</div><div><div class="stat-val">${pro.length}</div><div class="stat-lbl">Prontuários</div></div></div>
+  `;
+
+  const upcoming = age.sort((a,b)=>a.data_consulta.localeCompare(b.data_consulta)).slice(0,5);
+  $('upcoming-list').innerHTML = upcoming.length ? upcoming.map(c => consultaItemHtml(c)).join('')
+    : `<div class="hist-empty"><div class="ei">📅</div><p>Você não tem consultas agendadas.</p><br/><button class="btn btn-primary" onclick="goPage('agendar')">Agendar agora</button></div>`;
+}
+
+function consultaItemHtml(c, showProBtn=false) {
+  const m   = getMed(c.id_medico);
+  const esp = getEsp(m.id_especialidade||0);
+  const pro = DB.get('prontuarios').find(p=>p.id_consulta===c.id);
+  return `<div class="consult-item">
+    ${dateBox(c.data_consulta)}
+    <div class="consult-info">
+      <div class="consult-doc">${m.nome||'—'}</div>
+      <div class="consult-esp">${esp.nome||'—'}</div>
+      <div class="consult-meta">🕐 ${c.hora_consulta} &nbsp;·&nbsp; ${c.motivo||'Sem motivo informado'}</div>
+    </div>
+    <div class="consult-right">
+      ${badgeHtml(c.status)}
+      ${pro ? `<button onclick="viewPro(${pro.id})" class="btn-view-prontuario">Ver Prontuário</button>` : ''}
+      ${c.status==='AGENDADA' ? `<button onclick="cancelarConsulta(${c.id})" class="btn-cancelar-consulta">Cancelar</button>` : ''}
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  HISTÓRICO
+// ══════════════════════════════════════════════════
+function renderHistorico() {
+  let cons = DB.get('consultas').filter(c=>c.id_paciente===session.id);
+  const f  = $('filter-hist').value;
+  if (f) cons = cons.filter(c=>c.status===f);
+  cons.sort((a,b)=>b.data_consulta.localeCompare(a.data_consulta));
+  $('hist-list').innerHTML = cons.length ? cons.map(c=>consultaItemHtml(c,true)).join('')
+    : `<div class="hist-empty"><div class="ei">🗂️</div><p>Nenhuma consulta encontrada.</p></div>`;
+}
+
+function cancelarConsulta(id) {
+  if (!confirm('Cancelar esta consulta?')) return;
+  let cons = DB.get('consultas');
+  cons = cons.map(c => c.id===id ? {...c, status:'CANCELADA'} : c);
+  DB.set('consultas', cons);
+  toast('Consulta cancelada.', 'error');
+  renderHistorico(); renderInicio();
+}
+
+function viewPro(id) {
+  const pr = DB.get('prontuarios').find(x=>x.id===id); if (!pr) return;
+  const c  = DB.get('consultas').find(x=>x.id===pr.id_consulta)||{};
+  const m  = getMed(c.id_medico);
+  const esp= getEsp(m.id_especialidade||0);
+  $('modal-pro-body').innerHTML = `<div class="pro-view">
+    <div class="pro-med-info">
+      <div class="pro-med-avatar">${initials(m.nome||'?')}</div>
+      <div><div class="pro-med-name">${m.nome||'—'}</div><div class="pro-med-sub">${esp.nome||'—'} · ${fmtDate(c.data_consulta)} ${c.hora_consulta||''}</div></div>
+    </div>
+    <div class="pro-section"><h4>Diagnóstico</h4><p>${pr.diagnostico||'—'}</p></div>
+    <div class="pro-section"><h4>Prescrição</h4><p>${pr.prescricao||'—'}</p></div>
+    <div class="pro-section"><h4>Observações</h4><p>${pr.observacoes||'—'}</p></div>
+    <div class="pro-footer"><span class="pro-footer-text">Registrado em ${fmtDate(pr.data_registro)}</span></div>
+  </div>`;
+  $('modal-pro').classList.add('open');
+}
+
+// ══════════════════════════════════════════════════
+//  AGENDAMENTO — WIZARD
+// ══════════════════════════════════════════════════
+let ag = { espId: null, medId: null, data: null, hora: null, motivo: '' };
+let currentStep = 1;
+
+const HORARIOS = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'];
+
+function initAgendar() {
+  ag = { espId:null, medId:null, data:null, hora:null, motivo:'' };
+  currentStep = 1;
+  showStep(1);
+  renderEsps();
+}
+
+function showStep(n) {
+  for (let i=1; i<=4; i++) {
+    $(`step-${i}`).classList.toggle('active', i===n);
+    const ind = $(`step-ind-${i}`);
+    ind.classList.remove('active','done');
+    if (i < n)  ind.classList.add('done');
+    if (i === n) ind.classList.add('active');
+  }
+  $('step-success').classList.remove('active');
+}
+
+function renderEsps() {
+  const esps = DB.get('especialidades').filter(e=>e.ativo);
+  const icons = {1:'🩺',2:'❤️',3:'🔬',4:'👶',5:'🦴'};
+  $('esp-options').innerHTML = esps.map(e => `
+    <div class="option-card ${ag.espId===e.id?'selected':''}" onclick="selEsp(${e.id})">
+      <div class="oc-icon">${icons[e.id]||'🩺'}</div>
+      <div class="oc-name">${e.nome}</div>
+      <div class="oc-sub">${e.descricao||''}</div>
+    </div>`).join('');
+}
+
+function selEsp(id) {
+  ag.espId = id; ag.medId = null;
+  renderEsps();
+}
+
+function renderMeds() {
+  const meds = DB.get('medicos').filter(m=>m.id_especialidade===ag.espId && m.ativo);
+  $('med-options').innerHTML = meds.length ? meds.map(m=>`
+    <div class="med-card ${ag.medId===m.id?'selected':''}" onclick="selMed(${m.id})">
+      <div class="med-avatar">${initials(m.nome)}</div>
+      <div><div class="med-name">${m.nome}</div><div class="med-crm">${m.crm}</div></div>
+    </div>`).join('')
+  : `<div class="med-empty">Nenhum médico disponível nesta especialidade.</div>`;
+}
+
+function selMed(id) { ag.medId = id; renderMeds(); }
+
+function renderHorarios() {
+  ag.data = $('ag-data').value;
+  if (!ag.data) { $('horarios-grid').innerHTML=''; return; }
+  const ocupados = DB.get('consultas')
+    .filter(c => c.id_medico===ag.medId && c.data_consulta===ag.data && c.status!=='CANCELADA')
+    .map(c=>c.hora_consulta);
+  $('horarios-grid').innerHTML = HORARIOS.map(h => {
+    const occ = ocupados.includes(h);
+    return `<div class="horario-btn ${occ?'occupied':ag.hora===h?'selected':''}" onclick="${occ?'':'selHora(\''+h+'\')'}">
+      ${h} ${occ?'<br/><span class="horario-label-ocupado">Ocupado</span>':''}
+    </div>`;
+  }).join('');
+}
+
+function selHora(h) { ag.hora = h; renderHorarios(); }
+
+function nextStep(n) {
+  if (n===2) {
+    if (!ag.espId) { toast('Selecione uma especialidade!','error'); return; }
+    renderMeds();
+  }
+  if (n===3) {
+    if (!ag.medId) { toast('Selecione um médico!','error'); return; }
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+    $('ag-data').min = tomorrow.toISOString().slice(0,10);
+    $('ag-data').value = ag.data||'';
+    renderHorarios();
+  }
+  if (n===4) {
+    if (!ag.data) { toast('Selecione uma data!','error'); return; }
+    if (!ag.hora) { toast('Selecione um horário!','error'); return; }
+    ag.motivo = $('ag-motivo').value;
+    renderResumo();
+  }
+  currentStep = n;
+  showStep(n);
+}
+
+function prevStep(n) { currentStep = n; showStep(n); }
+
+function renderResumo() {
+  const esp = getEsp(ag.espId);
+  const med = getMed(ag.medId);
+  const me  = getMe();
+  $('resumo-box').innerHTML = `
+    <div class="resumo-row"><span class="resumo-label">Paciente</span><span class="resumo-val">${me.nome||'—'}</span></div>
+    <div class="resumo-row"><span class="resumo-label">Especialidade</span><span class="resumo-val">${esp.nome||'—'}</span></div>
+    <div class="resumo-row"><span class="resumo-label">Médico</span><span class="resumo-val">${med.nome||'—'}</span></div>
+    <div class="resumo-row"><span class="resumo-label">Data</span><span class="resumo-val">${fmtDate(ag.data)}</span></div>
+    <div class="resumo-row"><span class="resumo-label">Horário</span><span class="resumo-val">${ag.hora}</span></div>
+    <div class="resumo-row"><span class="resumo-label">Motivo</span><span class="resumo-val">${ag.motivo||'Não informado'}</span></div>
+  `;
+}
+
+function confirmarConsulta() {
+  const novaConsulta = {
+    id: DB.nextId('consultas'),
+    id_paciente: session.id,
+    id_medico: ag.medId,
+    data_consulta: ag.data,
+    hora_consulta: ag.hora,
+    status: 'AGENDADA',
+    motivo: ag.motivo,
+    valor: null
+  };
+  const cons = DB.get('consultas');
+  cons.push(novaConsulta);
+  DB.set('consultas', cons);
+
+  // Show success
+  const esp = getEsp(ag.espId);
+  const med = getMed(ag.medId);
+  $('success-detail').innerHTML = `
+    <p>🏥 <strong>${esp.nome}</strong> — ${med.nome}<br/>
+    📅 <strong>${fmtDate(ag.data)}</strong> às <strong>${ag.hora}</strong><br/>
+    ${ag.motivo ? `📌 ${ag.motivo}` : ''}</p>
+  `;
+  for(let i=1;i<=4;i++) $(`step-${i}`).classList.remove('active');
+  for(let i=1;i<=4;i++) $(`step-ind-${i}`).classList.add('done');
+  $('step-success').classList.add('active');
+  toast('Consulta agendada com sucesso! 🎉');
+}
+
+function novoAgendamento() {
+  ag = {espId:null,medId:null,data:null,hora:null,motivo:''};
+  initAgendar();
+}
+
+// ══════════════════════════════════════════════════
+//  PERFIL
+// ══════════════════════════════════════════════════
+function renderPerfil() {
+  const me = getMe();
+  const sexMap = {M:'Masculino',F:'Feminino',O:'Outro'};
+  $('perf-av').textContent   = initials(me.nome||'?');
+  $('perf-nome').textContent = me.nome||'—';
+  $('perf-email').textContent = me.email||session.email||'—';
+  $('perf-since').textContent = `Cadastrado em ${fmtDate(me.data_cadastro)}`;
+  $('perfil-grid').innerHTML = `
+    <div class="perfil-field"><label>CPF</label><span>${me.cpf||'—'}</span></div>
+    <div class="perfil-field"><label>Data de Nascimento</label><span>${fmtDate(me.data_nascimento)}</span></div>
+    <div class="perfil-field"><label>Sexo</label><span>${sexMap[me.sexo]||'—'}</span></div>
+    <div class="perfil-field"><label>Telefone</label><span>${me.telefone||'—'}</span></div>
+    <div class="perfil-field"><label>CEP</label><span>${me.cep||'—'}</span></div>
+    <div class="perfil-field"><label>Endereço</label><span>${me.endereco||'—'}</span></div>
+  `;
+}
+
+function alterarSenha() {
+  const atual = $('pw-atual').value;
+  const nova  = $('pw-nova').value;
+  const conf  = $('pw-conf').value;
+  if (!atual||!nova||!conf) { toast('Preencha todos os campos!','error'); return; }
+  if (nova.length < 6) { toast('Nova senha muito curta (mín. 6 caracteres)','error'); return; }
+  if (nova !== conf) { toast('A nova senha e a confirmação não coincidem!','error'); return; }
+  const auths = DB.get('pac_auth');
+  const auth  = auths.find(a=>a.id_paciente===session.id);
+  if (!auth || auth.senha !== hashPw(atual)) { toast('Senha atual incorreta!','error'); return; }
+  const updated = auths.map(a => a.id_paciente===session.id ? {...a, senha: hashPw(nova)} : a);
+  DB.set('pac_auth', updated);
+  $('pw-atual').value=''; $('pw-nova').value=''; $('pw-conf').value='';
+  toast('Senha alterada com sucesso! 🔒');
+}
+
+function hashPw(pw) { return btoa(unescape(encodeURIComponent(pw))); }
+
+// ══════════════════════════════════════════════════
+//  LOGOUT
+// ══════════════════════════════════════════════════
+function doLogout() {
+  localStorage.removeItem('session_pac');
+  window.location.href = 'login.html';
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+function init() {
+  const me = getMe();
+  if (!me.id) { doLogout(); return; }
+  const av = initials(me.nome||'?');
+  $('user-av').textContent   = av;
+  $('user-name').textContent = me.nome.split(' ')[0];
+  renderInicio();
+}
+
+init();
+</script>
+</body>
+</html>

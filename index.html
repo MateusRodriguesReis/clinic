@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ClínicaDB — Sistema de Gestão Médica</title>
+<link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <span class="icon">🏥</span>
+    <div>
+      <h1>ClínicaDB</h1>
+      <span>Gestão Médica</span>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+
+    <div class="nav-section">Cadastros</div>
+    <div class="nav-item" data-page="pacientes">
+      <span class="nav-icon">👤</span> Pacientes
+    </div>
+    <div class="nav-item" data-page="medicos">
+      <span class="nav-icon">👨‍⚕️</span> Médicos
+    </div>
+    <div class="nav-item" data-page="especialidades">
+      <span class="nav-icon">🩺</span> Especialidades
+    </div>
+
+    <div class="nav-section">Atendimento</div>
+    <div class="nav-item" data-page="consultas">
+      <span class="nav-icon">📅</span> Consultas
+    </div>
+    <div class="nav-item" data-page="prontuarios">
+      <span class="nav-icon">📋</span> Prontuários
+    </div>
+
+    <div class="nav-section">Análise</div>
+    <div class="nav-item" data-page="relatorios">
+      <span class="nav-icon">📈</span> Relatórios
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="login.html">
+      <span>🧑‍⚕️</span> Portal do Paciente
+    </a>
+    <button class="btn-admin" id="btn-admin" title="Painel de Administração">⚙️ Admin</button>
+    <span class="version-text">v1.0 · Oracle DB Simulation</span>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+  <header id="header">
+    <div class="page-title" id="hdr-title">Dashboard</div>
+    <div class="header-right">
+      <span class="header-date" id="hdr-date"></span>
+      <button class="btn-new" id="btn-new">＋ Novo Registro</button>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header"><span class="card-title">📅 Próximas Consultas</span></div>
+          <div id="dash-consultas"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">👤 Pacientes Recentes</span></div>
+          <div id="dash-pacientes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PACIENTES ═══ -->
+    <div class="page" id="page-pacientes">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Pacientes Cadastrados</span>
+        </div>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-pac" placeholder="Buscar por nome ou CPF…"/>
+          </div>
+          <select class="filter-select" id="filter-pac-sexo">
+            <option value="">Todos os sexos</option>
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+            <option value="O">Outro</option>
+          </select>
+        </div>
+        <div class="card-body"><table id="tbl-pacientes">
+          <thead><tr>
+            <th>#</th><th>Nome</th><th>CPF</th><th>Nascimento</th><th>Sexo</th><th>Telefone</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="body-pacientes"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ MÉDICOS ═══ -->
+    <div class="page" id="page-medicos">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Médicos da Clínica</span></div>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-med" placeholder="Buscar por nome ou CRM…"/>
+          </div>
+          <select class="filter-select" id="filter-med-esp"></select>
+        </div>
+        <div class="card-body"><table>
+          <thead><tr><th>#</th><th>Nome</th><th>CRM</th><th>Especialidade</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="body-medicos"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ ESPECIALIDADES ═══ -->
+    <div class="page" id="page-especialidades">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Especialidades</span></div>
+        <div class="card-body"><table>
+          <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="body-especialidades"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ CONSULTAS ═══ -->
+    <div class="page" id="page-consultas">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Agendamentos e Consultas</span></div>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-con" placeholder="Buscar por paciente ou médico…"/>
+          </div>
+          <select class="filter-select" id="filter-con-status">
+            <option value="">Todos os status</option>
+            <option value="AGENDADA">Agendada</option>
+            <option value="REALIZADA">Realizada</option>
+            <option value="CANCELADA">Cancelada</option>
+            <option value="FALTA">Falta</option>
+          </select>
+        </div>
+        <div class="card-body"><table>
+          <thead><tr><th>#</th><th>Paciente</th><th>Médico</th><th>Data</th><th>Hora</th><th>Status</th><th>Valor</th><th>Ações</th></tr></thead>
+          <tbody id="body-consultas"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ PRONTUÁRIOS ═══ -->
+    <div class="page" id="page-prontuarios">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Prontuários Médicos</span></div>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-pro" placeholder="Buscar por paciente ou diagnóstico…"/>
+          </div>
+        </div>
+        <div class="card-body"><table>
+          <thead><tr><th>#</th><th>Paciente</th><th>Médico</th><th>Data Consulta</th><th>Diagnóstico</th><th>Registro</th><th>Ações</th></tr></thead>
+          <tbody id="body-prontuarios"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ RELATÓRIOS ═══ -->
+    <div class="page" id="page-relatorios">
+      <div class="rel-grid">
+        <div class="rel-card active" data-rel="faturamento" onclick="runReport(this,'faturamento')">
+          <div class="rel-icon">💰</div>
+          <h3>Faturamento</h3>
+          <p>Receita por médico</p>
+        </div>
+        <div class="rel-card" data-rel="consultas_status" onclick="runReport(this,'consultas_status')">
+          <div class="rel-icon">📊</div>
+          <h3>Status das Consultas</h3>
+          <p>Totais por status</p>
+        </div>
+        <div class="rel-card" data-rel="pacientes_top" onclick="runReport(this,'pacientes_top')">
+          <div class="rel-icon">👥</div>
+          <h3>Top Pacientes</h3>
+          <p>Maior número de consultas</p>
+        </div>
+        <div class="rel-card" data-rel="medicos_perf" onclick="runReport(this,'medicos_perf')">
+          <div class="rel-icon">👨‍⚕️</div>
+          <h3>Desempenho Médicos</h3>
+          <p>Consultas por especialidade</p>
+        </div>
+        <div class="rel-card" data-rel="convenios" onclick="runReport(this,'convenios')">
+          <div class="rel-icon">🏷️</div>
+          <h3>Convênios</h3>
+          <p>Pacientes por operadora</p>
+        </div>
+        <div class="rel-card" data-rel="proximas" onclick="runReport(this,'proximas')">
+          <div class="rel-icon">📅</div>
+          <h3>Agenda</h3>
+          <p>Próximas consultas</p>
+        </div>
+      </div>
+      <div id="rel-output"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Paciente -->
+<div class="overlay" id="modal-paciente">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="pac-modal-title">Novo Paciente</h2>
+      <button class="modal-close" onclick="closeModal('modal-paciente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Nome completo *</label><input id="pac-nome" placeholder="Ex: João da Silva"/></div>
+        <div class="form-group"><label>CPF *</label><input id="pac-cpf" placeholder="000.000.000-00"/></div>
+        <div class="form-group"><label>Data de nascimento *</label><input type="date" id="pac-nasc"/></div>
+        <div class="form-group"><label>Sexo *</label>
+          <select id="pac-sexo"><option value="">Selecione</option><option value="M">Masculino</option><option value="F">Feminino</option><option value="O">Outro</option></select>
+        </div>
+        <div class="form-group"><label>Telefone</label><input id="pac-tel" placeholder="(21) 99000-0000"/></div>
+        <div class="form-group"><label>E-mail</label><input id="pac-email" placeholder="email@exemplo.com"/></div>
+        <div class="form-group full"><label>Endereço</label><input id="pac-end" placeholder="Rua, número, bairro"/></div>
+        <div class="form-group"><label>CEP</label><input id="pac-cep" placeholder="00000-000"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-paciente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePaciente()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Médico -->
+<div class="overlay" id="modal-medico">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="med-modal-title">Novo Médico</h2>
+      <button class="modal-close" onclick="closeModal('modal-medico')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Nome completo *</label><input id="med-nome" placeholder="Dr(a). Nome"/></div>
+        <div class="form-group"><label>CRM *</label><input id="med-crm" placeholder="CRM/RJ-00000"/></div>
+        <div class="form-group"><label>Especialidade *</label><select id="med-esp"></select></div>
+        <div class="form-group"><label>Telefone</label><input id="med-tel" placeholder="(21) 99000-0000"/></div>
+        <div class="form-group"><label>E-mail</label><input id="med-email" placeholder="email@clinica.com"/></div>
+        <div class="form-group"><label>Status</label>
+          <select id="med-ativo"><option value="1">Ativo</option><option value="0">Inativo</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-medico')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMedico()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Especialidade -->
+<div class="overlay" id="modal-especialidade">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Especialidade</h2>
+      <button class="modal-close" onclick="closeModal('modal-especialidade')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Nome *</label><input id="esp-nome" placeholder="Ex: Cardiologia"/></div>
+        <div class="form-group full"><label>Descrição</label><textarea id="esp-desc" placeholder="Breve descrição da especialidade"></textarea></div>
+        <div class="form-group"><label>Status</label>
+          <select id="esp-ativo"><option value="1">Ativa</option><option value="0">Inativa</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-especialidade')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEspecialidade()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Consulta -->
+<div class="overlay" id="modal-consulta">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="con-modal-title">Nova Consulta</h2>
+      <button class="modal-close" onclick="closeModal('modal-consulta')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Paciente *</label><select id="con-pac"></select></div>
+        <div class="form-group full"><label>Médico *</label><select id="con-med"></select></div>
+        <div class="form-group"><label>Data *</label><input type="date" id="con-data"/></div>
+        <div class="form-group"><label>Hora *</label><input type="time" id="con-hora"/></div>
+        <div class="form-group"><label>Status</label>
+          <select id="con-status">
+            <option value="AGENDADA">Agendada</option>
+            <option value="REALIZADA">Realizada</option>
+            <option value="CANCELADA">Cancelada</option>
+            <option value="FALTA">Falta</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Valor (R$)</label><input type="number" id="con-valor" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="form-group full"><label>Motivo</label><textarea id="con-motivo" placeholder="Motivo da consulta…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-consulta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConsulta()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prontuário -->
+<div class="overlay" id="modal-prontuario">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="pro-modal-title">Prontuário Médico</h2>
+      <button class="modal-close" onclick="closeModal('modal-prontuario')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="pro-consulta-info" class="consultation-info"></div>
+      <div class="form-grid">
+        <div class="form-group full"><label>Diagnóstico (CID)</label><textarea id="pro-diag" placeholder="Ex: G43 — Enxaqueca sem aura"></textarea></div>
+        <div class="form-group full"><label>Prescrição</label><textarea id="pro-presc" placeholder="Medicamentos e dosagens…"></textarea></div>
+        <div class="form-group full"><label>Observações</label><textarea id="pro-obs" placeholder="Orientações, pedido de exames…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-prontuario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProntuario()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Prontuário -->
+<div class="overlay" id="modal-view-pro">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📋 Prontuário Médico</h2>
+      <button class="modal-close" onclick="closeModal('modal-view-pro')">✕</button>
+    </div>
+    <div class="modal-body" id="view-pro-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-view-pro')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel Modal -->
+<div class="overlay" id="modal-admin">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>⚙️ Painel de Administração</h2>
+      <button class="modal-close" onclick="closeModal('modal-admin')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <div style="padding: 16px; background: #fff3cd; border-radius: 9px; border-left: 4px solid #ffc107;">
+          <h4 style="margin-bottom: 8px; color: #856404;">⚠️ Gerenciar Dados</h4>
+          <p style="font-size: 13px; color: #856404; margin-bottom: 12px;">Cuidado! Estas operações afetam todos os dados do sistema.</p>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <button class="btn btn-ghost" onclick="exportarDados()" style="text-align: center;">
+              📥 Exportar Dados
+            </button>
+            <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()" style="text-align: center;">
+              📤 Importar Dados
+            </button>
+          </div>
+          <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importarDados(event)"/>
+          
+          <button class="btn" style="width: 100%; background: #e74c3c; color: white; border: none; border-radius: 9px; padding: 10px 12px; font-weight: 700; cursor: pointer; transition: all .15s;" 
+            onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" 
+            onclick="limparTodosDados()">
+            🗑️ Limpar Todos os Dados
+          </button>
+        </div>
+
+        <div style="padding: 16px; background: #e8f4f8; border-radius: 9px; border-left: 4px solid #0099cc;">
+          <h4 style="margin-bottom: 8px; color: #0c5460;">ℹ️ Informações</h4>
+          <div style="font-size: 13px; color: #0c5460; line-height: 1.6;">
+            <p><strong>Pacientes:</strong> <span id="info-pacs">0</span></p>
+            <p><strong>Médicos:</strong> <span id="info-meds">0</span></p>
+            <p><strong>Especialidades:</strong> <span id="info-esps">0</span></p>
+            <p><strong>Consultas:</strong> <span id="info-cons">0</span></p>
+            <p><strong>Prontuários:</strong> <span id="info-pros">0</span></p>
+            <p style="margin-top: 10px; font-size: 12px; color: #0a3f51;">
+              💾 Tamanho localStorage: <span id="info-size">0 KB</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-admin')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA LAYER — localStorage simulating Oracle DB
+// ═══════════════════════════════════════════════════
+const DB = {
+  get(k)    { return JSON.parse(localStorage.getItem(k) || '[]'); },
+  set(k,v)  { localStorage.setItem(k, JSON.stringify(v)); },
+  nextId(k) { const r = JSON.parse(localStorage.getItem(k+'_seq') || '0') + 1; localStorage.setItem(k+'_seq', r); return r; }
+};
+
+function seed() {
+  if (DB.get('seeded').length) return;
+
+  // ESPECIALIDADES
+  const esps = [
+    {id:1,nome:'Clínica Geral',   descricao:'Atendimento geral e triagem',               ativo:1},
+    {id:2,nome:'Cardiologia',     descricao:'Doenças do coração e sistema circulatório',  ativo:1},
+    {id:3,nome:'Dermatologia',    descricao:'Doenças da pele, cabelo e unhas',            ativo:1},
+    {id:4,nome:'Pediatria',       descricao:'Atendimento a crianças e adolescentes',      ativo:1},
+    {id:5,nome:'Ortopedia',       descricao:'Ossos, articulações e musculatura',          ativo:1},
+  ];
+  DB.set('especialidades', esps);
+  localStorage.setItem('especialidades_seq', '5');
+
+  // MÉDICOS
+  const meds = [
+    {id:1,nome:'Dr. Carlos Lima',    crm:'CRM/RJ-12345',id_especialidade:1,telefone:'(21) 99001-1111',email:'carlos@clinica.com',ativo:1},
+    {id:2,nome:'Dra. Ana Ferreira',  crm:'CRM/RJ-23456',id_especialidade:2,telefone:'(21) 99001-2222',email:'ana@clinica.com',   ativo:1},
+    {id:3,nome:'Dr. Paulo Souza',    crm:'CRM/RJ-34567',id_especialidade:3,telefone:'(21) 99001-3333',email:'paulo@clinica.com', ativo:1},
+    {id:4,nome:'Dra. Mariana Costa', crm:'CRM/RJ-45678',id_especialidade:4,telefone:'(21) 99001-4444',email:'mariana@clinica.com',ativo:1},
+  ];
+  DB.set('medicos', meds);
+  localStorage.setItem('medicos_seq', '4');
+
+  // PACIENTES
+  const pacs = [
+    {id:1,nome:'João Silva',      cpf:'111.222.333-44',data_nascimento:'1990-03-15',sexo:'M',telefone:'(21) 98000-0001',email:'joao@email.com',   endereco:'Rua das Flores, 100 — Madureira',   cep:'21300-000',data_cadastro:'2025-01-10'},
+    {id:2,nome:'Maria Oliveira',  cpf:'222.333.444-55',data_nascimento:'1985-07-22',sexo:'F',telefone:'(21) 98000-0002',email:'maria@email.com',  endereco:'Av. Brasil, 500 — Centro',          cep:'20900-000',data_cadastro:'2025-01-15'},
+    {id:3,nome:'Pedro Santos',    cpf:'333.444.555-66',data_nascimento:'2000-11-30',sexo:'M',telefone:'(21) 98000-0003',email:'pedro@email.com',  endereco:'Rua Uruguai, 40 — Tijuca',          cep:'20510-060',data_cadastro:'2025-02-03'},
+    {id:4,nome:'Luciana Rocha',   cpf:'444.555.666-77',data_nascimento:'1978-01-05',sexo:'F',telefone:'(21) 98000-0004',email:'luciana@email.com',endereco:'Rua Conde de Bonfim, 200 — Tijuca', cep:'20520-050',data_cadastro:'2025-02-20'},
+  ];
+  DB.set('pacientes', pacs);
+  localStorage.setItem('pacientes_seq', '4');
+
+  // CONSULTAS
+  const cons = [
+    {id:1,id_paciente:1,id_medico:1,data_consulta:'2025-07-10',hora_consulta:'09:00',status:'REALIZADA', motivo:'Dor de cabeça frequente',  valor:150},
+    {id:2,id_paciente:2,id_medico:2,data_consulta:'2025-07-12',hora_consulta:'10:30',status:'REALIZADA', motivo:'Palpitações e cansaço',    valor:250},
+    {id:3,id_paciente:3,id_medico:1,data_consulta:'2025-07-15',hora_consulta:'14:00',status:'AGENDADA',  motivo:'Consulta de rotina',       valor:150},
+    {id:4,id_paciente:4,id_medico:3,data_consulta:'2025-07-16',hora_consulta:'11:00',status:'AGENDADA',  motivo:'Manchas na pele',          valor:200},
+    {id:5,id_paciente:1,id_medico:2,data_consulta:'2025-07-20',hora_consulta:'08:00',status:'CANCELADA', motivo:'Acompanhamento cardíaco',  valor:250},
+  ];
+  DB.set('consultas', cons);
+  localStorage.setItem('consultas_seq', '5');
+
+  // PRONTUÁRIOS
+  const pros = [
+    {id:1,id_consulta:1,diagnostico:'G43 — Enxaqueca sem aura',prescricao:'Dipirona 500mg — 1 comprimido a cada 6h por 3 dias',observacoes:'Paciente orientado a reduzir cafeína e manter hidratação.',data_registro:'2025-07-10'},
+    {id:2,id_consulta:2,diagnostico:'R00.0 — Taquicardia',     prescricao:'Atenolol 25mg — 1 comprimido em jejum por 30 dias', observacoes:'Solicitar ECG e Holter 24h. Retorno em 30 dias.',          data_registro:'2025-07-12'},
+  ];
+  DB.set('prontuarios', pros);
+  localStorage.setItem('prontuarios_seq', '2');
+
+  // AUTENTICAÇÃO DE TESTE (permite login com pacientes de seed)
+  const auths = [
+    {id_paciente:1, email:'joao@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))},
+    {id_paciente:2, email:'maria@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))},
+    {id_paciente:3, email:'pedro@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))},
+    {id_paciente:4, email:'luciana@email.com', senha:btoa(unescape(encodeURIComponent('senha123')))}
+  ];
+  DB.set('pac_auth', auths);
+
+  DB.set('seeded', [1]);
+}
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const fmtDate = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+const fmtMoney = v => v != null ? 'R$ ' + Number(v).toFixed(2).replace('.',',') : '—';
+const initials = s => s.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+function getPac(id)  { return DB.get('pacientes').find(x=>x.id==id) || {}; }
+function getMed(id)  { return DB.get('medicos').find(x=>x.id==id) || {}; }
+function getEsp(id)  { return DB.get('especialidades').find(x=>x.id==id) || {}; }
+function getCon(id)  { return DB.get('consultas').find(x=>x.id==id) || {}; }
+
+function toast(msg, type='success') {
+  const t = $('toast'); t.textContent = msg; t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 2500);
+}
+
+function openModal(id)  { $(id).classList.add('open'); }
+function closeModal(id) { $(id).classList.remove('open'); currentEditId = null; }
+
+let currentEditId  = null;
+let currentPage    = 'dashboard';
+let currentProConId = null;
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+const pageTitles = {
+  dashboard:'Dashboard', pacientes:'Pacientes', medicos:'Médicos',
+  especialidades:'Especialidades', consultas:'Consultas',
+  prontuarios:'Prontuários', relatorios:'Relatórios'
+};
+const newBtnLabels = {
+  pacientes:'+ Novo Paciente', medicos:'+ Novo Médico',
+  especialidades:'+ Nova Especialidade', consultas:'+ Nova Consulta',
+  prontuarios:'+ Novo Prontuário', dashboard:'', relatorios:''
+};
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    const page = el.dataset.page;
+    currentPage = page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    $('page-'+page).classList.add('active');
+    $('hdr-title').textContent = pageTitles[page];
+    const lbl = newBtnLabels[page] || '';
+    $('btn-new').style.display = lbl ? '' : 'none';
+    $('btn-new').textContent = lbl;
+    renderPage(page);
+  });
+});
+
+$('btn-new').addEventListener('click', () => {
+  currentEditId = null;
+  if (currentPage === 'pacientes')      { clearPacForm(); $('pac-modal-title').textContent='Novo Paciente'; openModal('modal-paciente'); }
+  if (currentPage === 'medicos')        { clearMedForm(); $('med-modal-title').textContent='Novo Médico';   openModal('modal-medico'); }
+  if (currentPage === 'especialidades') { clearEspForm(); openModal('modal-especialidade'); }
+  if (currentPage === 'consultas')      { clearConForm(); $('con-modal-title').textContent='Nova Consulta'; openModal('modal-consulta'); }
+  if (currentPage === 'prontuarios')    { openProntuarioNew(); }
+});
+
+function renderPage(p) {
+  if (p==='dashboard')     renderDashboard();
+  if (p==='pacientes')     renderPacientes();
+  if (p==='medicos')       renderMedicos();
+  if (p==='especialidades')renderEspecialidades();
+  if (p==='consultas')     renderConsultas();
+  if (p==='prontuarios')   renderProntuarios();
+  if (p==='relatorios')    { runReport(document.querySelector('.rel-card.active'), 'faturamento'); }
+}
+
+// ═══════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════
+function renderDashboard() {
+  const pacs = DB.get('pacientes');
+  const meds = DB.get('medicos');
+  const cons = DB.get('consultas');
+  const pros = DB.get('prontuarios');
+
+  const agendadas = cons.filter(c=>c.status==='AGENDADA').length;
+  const receita   = cons.filter(c=>c.status==='REALIZADA').reduce((s,c)=>s+(+c.valor||0),0);
+
+  $('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-icon blue">👤</div><div><div class="stat-val">${pacs.length}</div><div class="stat-lbl">Pacientes Cadastrados</div></div></div>
+    <div class="stat-card"><div class="stat-icon teal">👨‍⚕️</div><div><div class="stat-val">${meds.length}</div><div class="stat-lbl">Médicos Ativos</div></div></div>
+    <div class="stat-card"><div class="stat-icon orange">📅</div><div><div class="stat-val">${agendadas}</div><div class="stat-lbl">Consultas Agendadas</div></div></div>
+    <div class="stat-card"><div class="stat-icon green">💰</div><div><div class="stat-val">${fmtMoney(receita)}</div><div class="stat-lbl">Receita Total</div></div></div>
+  `;
+
+  const upcoming = cons.filter(c=>c.status==='AGENDADA').sort((a,b)=>a.data_consulta.localeCompare(b.data_consulta)).slice(0,5);
+  $('dash-consultas').innerHTML = upcoming.length ? upcoming.map(c => {
+    const p = getPac(c.id_paciente); const m = getMed(c.id_medico);
+    return `<div class="list-item">
+      <div class="list-item-left">
+        <div class="avatar">${initials(p.nome||'?')}</div>
+        <div><div class="list-name">${p.nome||'—'}</div><div class="list-sub">Dr(a). ${m.nome||'—'} · ${c.hora_consulta}</div></div>
+      </div>
+      <div class="date-text">${fmtDate(c.data_consulta)}</div>
+    </div>`;
+  }).join('') : '<div class="empty"><div class="empty-icon">📅</div><p>Nenhuma consulta agendada</p></div>';
+
+  const recPacs = [...pacs].reverse().slice(0,5);
+  $('dash-pacientes').innerHTML = recPacs.length ? recPacs.map(p => `
+    <div class="list-item">
+      <div class="list-item-left">
+        <div class="avatar teal">${initials(p.nome||'?')}</div>
+        <div><div class="list-name">${p.nome}</div><div class="list-sub">${p.cpf} · ${p.telefone||'—'}</div></div>
+      </div>
+      <span class="badge badge-${p.sexo.toLowerCase()}">${p.sexo==='M'?'Masc':p.sexo==='F'?'Fem':'Outro'}</span>
+    </div>
+  `).join('') : '';
+}
+
+// ═══════════════════════════════════════════════════
+//  PACIENTES
+// ═══════════════════════════════════════════════════
+function renderPacientes(filter='', sexo='') {
+  let data = DB.get('pacientes');
+  if (filter) data = data.filter(p => p.nome.toLowerCase().includes(filter.toLowerCase()) || p.cpf.includes(filter));
+  if (sexo)   data = data.filter(p => p.sexo === sexo);
+  const tbody = $('body-pacientes');
+  tbody.innerHTML = data.length ? data.map(p => `
+    <tr>
+      <td class="item-id">#${p.id}</td>
+      <td><div class="item-with-avatar"><div class="avatar">${initials(p.nome)}</div><span class="item-bold">${p.nome}</span></div></td>
+      <td class="item-code">${p.cpf}</td>
+      <td>${fmtDate(p.data_nascimento)}</td>
+      <td><span class="badge badge-${p.sexo.toLowerCase()}">${p.sexo==='M'?'Masculino':p.sexo==='F'?'Feminino':'Outro'}</span></td>
+      <td>${p.telefone||'—'}</td>
+      <td><div class="actions">
+        <button class="btn-icon btn-edit" title="Editar" onclick="editPaciente(${p.id})">✏️</button>
+        <button class="btn-icon btn-del"  title="Excluir" onclick="delPaciente(${p.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('') : `<tr><td colspan="7"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum paciente encontrado</p></div></td></tr>`;
+}
+
+$('search-pac').addEventListener('input', e => renderPacientes(e.target.value, $('filter-pac-sexo').value));
+$('filter-pac-sexo').addEventListener('change', e => renderPacientes($('search-pac').value, e.target.value));
+
+function clearPacForm() {
+  ['pac-nome','pac-cpf','pac-nasc','pac-tel','pac-email','pac-end','pac-cep'].forEach(id => $(id).value='');
+  $('pac-sexo').value='';
+}
+
+function editPaciente(id) {
+  currentEditId = id;
+  const p = DB.get('pacientes').find(x=>x.id===id);
+  if (!p) return;
+  $('pac-nome').value = p.nome; $('pac-cpf').value = p.cpf; $('pac-nasc').value = p.data_nascimento;
+  $('pac-sexo').value = p.sexo; $('pac-tel').value = p.telefone||''; $('pac-email').value = p.email||'';
+  $('pac-end').value = p.endereco||''; $('pac-cep').value = p.cep||'';
+  $('pac-modal-title').textContent = 'Editar Paciente';
+  openModal('modal-paciente');
+}
+
+function savePaciente() {
+  const nome = $('pac-nome').value.trim();
+  const cpf  = $('pac-cpf').value.trim();
+  const nasc = $('pac-nasc').value;
+  const sexo = $('pac-sexo').value;
+  if (!nome || !cpf || !nasc || !sexo) { toast('Preencha os campos obrigatórios!', 'error'); return; }
+  let pacs = DB.get('pacientes');
+  if (currentEditId) {
+    pacs = pacs.map(p => p.id===currentEditId ? {...p,nome,cpf,data_nascimento:nasc,sexo,telefone:$('pac-tel').value,email:$('pac-email').value,endereco:$('pac-end').value,cep:$('pac-cep').value} : p);
+    toast('Paciente atualizado com sucesso!');
+  } else {
+    const dup = pacs.find(p=>p.cpf===cpf);
+    if (dup) { toast('CPF já cadastrado!','error'); return; }
+    pacs.push({id:DB.nextId('pacientes'),nome,cpf,data_nascimento:nasc,sexo,telefone:$('pac-tel').value,email:$('pac-email').value,endereco:$('pac-end').value,cep:$('pac-cep').value,data_cadastro:new Date().toISOString().slice(0,10)});
+    toast('Paciente cadastrado com sucesso!');
+  }
+  DB.set('pacientes', pacs); closeModal('modal-paciente'); renderPacientes();
+}
+
+function delPaciente(id) {
+  if (!confirm('Excluir este paciente? Consultas vinculadas serão perdidas.')) return;
+  DB.set('pacientes', DB.get('pacientes').filter(p=>p.id!==id));
+  toast('Paciente excluído.'); renderPacientes(); renderDashboard();
+}
+
+// ═══════════════════════════════════════════════════
+//  MÉDICOS
+// ═══════════════════════════════════════════════════
+function renderMedicos(filter='', espId='') {
+  let data = DB.get('medicos');
+  if (filter) data = data.filter(m => m.nome.toLowerCase().includes(filter.toLowerCase()) || m.crm.toLowerCase().includes(filter.toLowerCase()));
+  if (espId)  data = data.filter(m => m.id_especialidade == espId);
+  const tbody = $('body-medicos');
+  tbody.innerHTML = data.length ? data.map(m => {
+    const esp = getEsp(m.id_especialidade);
+    return `<tr>
+      <td class="item-id">#${m.id}</td>
+      <td><span class="item-bold">${m.nome}</span></td>
+      <td class="item-code">${m.crm}</td>
+      <td>${esp.nome||'—'}</td>
+      <td>${m.telefone||'—'}</td>
+      <td><span class="badge badge-${m.ativo?'ativo':'inativo'}">${m.ativo?'Ativo':'Inativo'}</span></td>
+      <td><div class="actions">
+        <button class="btn-icon btn-edit" onclick="editMedico(${m.id})">✏️</button>
+        <button class="btn-icon btn-del"  onclick="delMedico(${m.id})">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="7"><div class="empty"><div class="empty-icon">👨‍⚕️</div><p>Nenhum médico encontrado</p></div></td></tr>`;
+}
+
+function populateEspFilters() {
+  const esps = DB.get('especialidades');
+  const sel = $('filter-med-esp');
+  sel.innerHTML = '<option value="">Todas especialidades</option>' + esps.map(e=>`<option value="${e.id}">${e.nome}</option>`).join('');
+  const medEsp = $('med-esp');
+  if (medEsp) medEsp.innerHTML = '<option value="">Selecione</option>' + esps.filter(e=>e.ativo).map(e=>`<option value="${e.id}">${e.nome}</option>`).join('');
+}
+
+$('search-med').addEventListener('input', e => renderMedicos(e.target.value, $('filter-med-esp').value));
+$('filter-med-esp').addEventListener('change', e => renderMedicos($('search-med').value, e.target.value));
+
+function clearMedForm() {
+  ['med-nome','med-crm','med-tel','med-email'].forEach(id => $(id).value='');
+  $('med-esp').value=''; $('med-ativo').value='1';
+  populateEspFilters();
+}
+
+function editMedico(id) {
+  currentEditId = id;
+  const m = DB.get('medicos').find(x=>x.id===id);
+  if (!m) return;
+  populateEspFilters();
+  $('med-nome').value=m.nome; $('med-crm').value=m.crm; $('med-esp').value=m.id_especialidade;
+  $('med-tel').value=m.telefone||''; $('med-email').value=m.email||''; $('med-ativo').value=m.ativo;
+  $('med-modal-title').textContent='Editar Médico'; openModal('modal-medico');
+}
+
+function saveMedico() {
+  const nome = $('med-nome').value.trim();
+  const crm  = $('med-crm').value.trim();
+  const esp  = +$('med-esp').value;
+  if (!nome || !crm || !esp) { toast('Preencha os campos obrigatórios!','error'); return; }
+  let meds = DB.get('medicos');
+  if (currentEditId) {
+    meds = meds.map(m => m.id===currentEditId ? {...m,nome,crm,id_especialidade:esp,telefone:$('med-tel').value,email:$('med-email').value,ativo:+$('med-ativo').value} : m);
+    toast('Médico atualizado!');
+  } else {
+    if (meds.find(m=>m.crm===crm)) { toast('CRM já cadastrado!','error'); return; }
+    meds.push({id:DB.nextId('medicos'),nome,crm,id_especialidade:esp,telefone:$('med-tel').value,email:$('med-email').value,ativo:1});
+    toast('Médico cadastrado!');
+  }
+  DB.set('medicos',meds); closeModal('modal-medico'); renderMedicos();
+}
+
+function delMedico(id) {
+  if (!confirm('Excluir este médico?')) return;
+  DB.set('medicos', DB.get('medicos').filter(m=>m.id!==id));
+  toast('Médico excluído.'); renderMedicos();
+}
+
+// ═══════════════════════════════════════════════════
+//  ESPECIALIDADES
+// ═══════════════════════════════════════════════════
+function renderEspecialidades() {
+  const data = DB.get('especialidades');
+  $('body-especialidades').innerHTML = data.map(e=>`
+    <tr>
+      <td class="item-id">#${e.id}</td>
+      <td><strong>${e.nome}</strong></td>
+      <td>${e.descricao||'—'}</td>
+      <td><span class="badge badge-${e.ativo?'ativo':'inativo'}">${e.ativo?'Ativa':'Inativa'}</span></td>
+      <td><div class="actions">
+        <button class="btn-icon btn-edit" onclick="editEsp(${e.id})">✏️</button>
+        <button class="btn-icon btn-del"  onclick="delEsp(${e.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function clearEspForm() { $('esp-nome').value=''; $('esp-desc').value=''; $('esp-ativo').value='1'; }
+
+function editEsp(id) {
+  currentEditId = id;
+  const e = DB.get('especialidades').find(x=>x.id===id);
+  if (!e) return;
+  $('esp-nome').value=e.nome; $('esp-desc').value=e.descricao||''; $('esp-ativo').value=e.ativo;
+  openModal('modal-especialidade');
+}
+
+function saveEspecialidade() {
+  const nome = $('esp-nome').value.trim();
+  if (!nome) { toast('Nome obrigatório!','error'); return; }
+  let esps = DB.get('especialidades');
+  if (currentEditId) {
+    esps = esps.map(e => e.id===currentEditId ? {...e,nome,descricao:$('esp-desc').value,ativo:+$('esp-ativo').value} : e);
+    toast('Especialidade atualizada!');
+  } else {
+    esps.push({id:DB.nextId('especialidades'),nome,descricao:$('esp-desc').value,ativo:1});
+    toast('Especialidade criada!');
+  }
+  DB.set('especialidades',esps); closeModal('modal-especialidade'); renderEspecialidades();
+}
+
+function delEsp(id) {
+  if (!confirm('Excluir esta especialidade?')) return;
+  DB.set('especialidades', DB.get('especialidades').filter(e=>e.id!==id));
+  toast('Especialidade excluída.'); renderEspecialidades();
+}
+
+// ═══════════════════════════════════════════════════
+//  CONSULTAS
+// ═══════════════════════════════════════════════════
+function renderConsultas(filter='', status='') {
+  let data = DB.get('consultas');
+  if (filter) {
+    data = data.filter(c => {
+      const p = getPac(c.id_paciente); const m = getMed(c.id_medico);
+      return (p.nome||'').toLowerCase().includes(filter.toLowerCase()) || (m.nome||'').toLowerCase().includes(filter.toLowerCase());
+    });
+  }
+  if (status) data = data.filter(c=>c.status===status);
+  data.sort((a,b)=>b.data_consulta.localeCompare(a.data_consulta));
+  const hasPro = id => DB.get('prontuarios').some(p=>p.id_consulta===id);
+  $('body-consultas').innerHTML = data.length ? data.map(c=>{
+    const p=getPac(c.id_paciente); const m=getMed(c.id_medico);
+    return `<tr>
+      <td class="item-id">#${c.id}</td>
+      <td><strong>${p.nome||'—'}</strong></td>
+      <td>${m.nome||'—'}</td>
+      <td>${fmtDate(c.data_consulta)}</td>
+      <td><code class="inline-code">${c.hora_consulta}</code></td>
+      <td><span class="badge badge-${c.status.toLowerCase()}">${c.status}</span></td>
+      <td>${fmtMoney(c.valor)}</td>
+      <td><div class="actions">
+        <button class="btn-icon btn-edit" onclick="editConsulta(${c.id})">✏️</button>
+        ${c.status==='REALIZADA'&&!hasPro(c.id)?`<button class="btn-icon btn-view" title="Criar prontuário" onclick="openProntuarioFor(${c.id})">📋</button>`:''}
+        <button class="btn-icon btn-del" onclick="delConsulta(${c.id})">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📅</div><p>Nenhuma consulta encontrada</p></div></td></tr>`;
+}
+
+$('search-con').addEventListener('input', e => renderConsultas(e.target.value, $('filter-con-status').value));
+$('filter-con-status').addEventListener('change', e => renderConsultas($('search-con').value, e.target.value));
+
+function clearConForm() {
+  ['con-motivo'].forEach(id => $(id).value='');
+  $('con-data').value=''; $('con-hora').value=''; $('con-valor').value='';
+  $('con-status').value='AGENDADA';
+  const pacs = DB.get('pacientes');
+  const meds = DB.get('medicos');
+  $('con-pac').innerHTML = '<option value="">Selecione o paciente</option>' + pacs.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  $('con-med').innerHTML = '<option value="">Selecione o médico</option>' + meds.map(m=>`<option value="${m.id}">${m.nome}</option>`).join('');
+}
+
+function editConsulta(id) {
+  currentEditId = id;
+  const c = DB.get('consultas').find(x=>x.id===id);
+  if (!c) return;
+  clearConForm();
+  $('con-pac').value=c.id_paciente; $('con-med').value=c.id_medico;
+  $('con-data').value=c.data_consulta; $('con-hora').value=c.hora_consulta;
+  $('con-status').value=c.status; $('con-valor').value=c.valor||'';
+  $('con-motivo').value=c.motivo||'';
+  $('con-modal-title').textContent='Editar Consulta'; openModal('modal-consulta');
+}
+
+function saveConsulta() {
+  const pac  = +$('con-pac').value;
+  const med  = +$('con-med').value;
+  const data = $('con-data').value;
+  const hora = $('con-hora').value;
+  if (!pac||!med||!data||!hora) { toast('Preencha os campos obrigatórios!','error'); return; }
+  let cons = DB.get('consultas');
+  const obj = {id_paciente:pac,id_medico:med,data_consulta:data,hora_consulta:hora,status:$('con-status').value,motivo:$('con-motivo').value,valor:+$('con-valor').value||null};
+  if (currentEditId) {
+    cons = cons.map(c=>c.id===currentEditId?{...c,...obj}:c);
+    toast('Consulta atualizada!');
+  } else {
+    cons.push({id:DB.nextId('consultas'),...obj});
+    toast('Consulta agendada!');
+  }
+  DB.set('consultas',cons); closeModal('modal-consulta'); renderConsultas(); renderDashboard();
+}
+
+function delConsulta(id) {
+  if (!confirm('Excluir esta consulta?')) return;
+  DB.set('consultas', DB.get('consultas').filter(c=>c.id!==id));
+  DB.set('prontuarios', DB.get('prontuarios').filter(p=>p.id_consulta!==id));
+  toast('Consulta excluída.'); renderConsultas();
+}
+
+// ═══════════════════════════════════════════════════
+//  PRONTUÁRIOS
+// ═══════════════════════════════════════════════════
+function renderProntuarios(filter='') {
+  let data = DB.get('prontuarios');
+  const tbody = $('body-prontuarios');
+  let rows = data.map(pr => {
+    const c = getCon(pr.id_consulta);
+    const p = getPac(c.id_paciente); const m = getMed(c.id_medico);
+    return {pr,c,p,m};
+  });
+  if (filter) rows = rows.filter(({pr,p})=> p.nome.toLowerCase().includes(filter.toLowerCase()) || (pr.diagnostico||'').toLowerCase().includes(filter.toLowerCase()));
+  tbody.innerHTML = rows.length ? rows.map(({pr,c,p,m})=>`
+    <tr>
+      <td class="item-id">#${pr.id}</td>
+      <td><strong>${p.nome||'—'}</strong></td>
+      <td>${m.nome||'—'}</td>
+      <td>${fmtDate(c.data_consulta)}</td>
+      <td class="truncated">${pr.diagnostico||'—'}</td>
+      <td>${fmtDate(pr.data_registro)}</td>
+      <td><div class="actions">
+        <button class="btn-icon btn-view" onclick="viewProntuario(${pr.id})">👁️</button>
+        <button class="btn-icon btn-edit" onclick="editProntuario(${pr.id})">✏️</button>
+        <button class="btn-icon btn-del"  onclick="delProntuario(${pr.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('')
+  : `<tr><td colspan="7"><div class="empty"><div class="empty-icon">📋</div><p>Nenhum prontuário encontrado</p></div></td></tr>`;
+}
+
+$('search-pro').addEventListener('input', e => renderProntuarios(e.target.value));
+
+function openProntuarioNew() {
+  const realized = DB.get('consultas').filter(c=>c.status==='REALIZADA');
+  const hasPro   = id => DB.get('prontuarios').some(p=>p.id_consulta===id);
+  const available = realized.filter(c=>!hasPro(c.id));
+  if (!available.length) { toast('Nenhuma consulta realizada sem prontuário disponível.','error'); return; }
+  openProntuarioFor(available[0].id);
+}
+
+function openProntuarioFor(conId) {
+  currentProConId = conId;
+  currentEditId = null;
+  const c = getCon(conId); const p = getPac(c.id_paciente); const m = getMed(c.id_medico);
+  $('pro-consulta-info').innerHTML = `📌 <strong>${p.nome||'—'}</strong> · ${m.nome||'—'} · ${fmtDate(c.data_consulta)} ${c.hora_consulta}`;
+  $('pro-diag').value=''; $('pro-presc').value=''; $('pro-obs').value='';
+  $('pro-modal-title').textContent='Novo Prontuário'; openModal('modal-prontuario');
+}
+
+function editProntuario(id) {
+  currentEditId = id;
+  const pr = DB.get('prontuarios').find(x=>x.id===id); if (!pr) return;
+  currentProConId = pr.id_consulta;
+  const c = getCon(pr.id_consulta); const p = getPac(c.id_paciente); const m = getMed(c.id_medico);
+  $('pro-consulta-info').innerHTML = `📌 <strong>${p.nome||'—'}</strong> · ${m.nome||'—'} · ${fmtDate(c.data_consulta)} ${c.hora_consulta}`;
+  $('pro-diag').value=pr.diagnostico||''; $('pro-presc').value=pr.prescricao||''; $('pro-obs').value=pr.observacoes||'';
+  $('pro-modal-title').textContent='Editar Prontuário'; openModal('modal-prontuario');
+}
+
+function saveProntuario() {
+  const diag  = $('pro-diag').value.trim();
+  const presc = $('pro-presc').value.trim();
+  const obs   = $('pro-obs').value.trim();
+  if (!diag) { toast('Diagnóstico obrigatório!','error'); return; }
+  let pros = DB.get('prontuarios');
+  if (currentEditId) {
+    pros = pros.map(p=>p.id===currentEditId?{...p,diagnostico:diag,prescricao:presc,observacoes:obs}:p);
+    toast('Prontuário atualizado!');
+  } else {
+    pros.push({id:DB.nextId('prontuarios'),id_consulta:currentProConId,diagnostico:diag,prescricao:presc,observacoes:obs,data_registro:new Date().toISOString().slice(0,10)});
+    toast('Prontuário registrado!');
+  }
+  DB.set('prontuarios',pros); closeModal('modal-prontuario'); renderProntuarios();
+}
+
+function viewProntuario(id) {
+  const pr = DB.get('prontuarios').find(x=>x.id===id); if (!pr) return;
+  const c = getCon(pr.id_consulta); const p = getPac(c.id_paciente); const m = getMed(c.id_medico); const esp = getEsp(getMed(c.id_medico).id_especialidade||0);
+  $('view-pro-content').innerHTML = `
+    <div class="grid-2col">
+      <div class="detail-box"><h4>Paciente</h4><p><strong>${p.nome||'—'}</strong><br/><span class="text-muted">${p.cpf||''}</span></p></div>
+      <div class="detail-box"><h4>Médico Responsável</h4><p><strong>${m.nome||'—'}</strong><br/><span class="text-muted">${esp.nome||''} · ${m.crm||''}</span></p></div>
+    </div>
+    <div class="grid-2col">
+      <div class="detail-box"><h4>Data da Consulta</h4><p>${fmtDate(c.data_consulta)} às ${c.hora_consulta}</p></div>
+      <div class="detail-box"><h4>Data do Registro</h4><p>${fmtDate(pr.data_registro)}</p></div>
+    </div>
+    <div class="detail-box"><h4>Diagnóstico</h4><p>${pr.diagnostico||'Não informado'}</p></div>
+    <div class="spacer"></div>
+    <div class="detail-box"><h4>Prescrição</h4><p>${pr.prescricao||'Nenhuma prescrição'}</p></div>
+    <div class="spacer"></div>
+    <div class="detail-box"><h4>Observações</h4><p>${pr.observacoes||'Nenhuma observação'}</p></div>
+  `;
+  openModal('modal-view-pro');
+}
+
+function delProntuario(id) {
+  if (!confirm('Excluir este prontuário?')) return;
+  DB.set('prontuarios', DB.get('prontuarios').filter(p=>p.id!==id));
+  toast('Prontuário excluído.'); renderProntuarios();
+}
+
+// ═══════════════════════════════════════════════════
+//  RELATÓRIOS
+// ═══════════════════════════════════════════════════
+function runReport(el, type) {
+  document.querySelectorAll('.rel-card').forEach(c=>c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const out = $('rel-output');
+  const cons = DB.get('consultas');
+  const pacs = DB.get('pacientes');
+  const meds = DB.get('medicos');
+
+  if (type === 'faturamento') {
+    const rows = meds.map(m => {
+      const mc = cons.filter(c=>c.id_medico===m.id && c.status==='REALIZADA');
+      const rec = mc.reduce((s,c)=>s+(+c.valor||0),0);
+      return {nome:m.nome, esp:getEsp(m.id_especialidade).nome||'—', qtd:mc.length, rec};
+    }).sort((a,b)=>b.rec-a.rec);
+    out.innerHTML = buildTable(['Médico','Especialidade','Consultas Realizadas','Receita Total'],
+      rows.map(r=>[r.nome,r.esp,r.qtd,`<strong class="strong-green">${fmtMoney(r.rec)}</strong>`]));
+  }
+  else if (type === 'consultas_status') {
+    const statuses = ['AGENDADA','REALIZADA','CANCELADA','FALTA'];
+    const rows = statuses.map(s => {
+      const items = cons.filter(c=>c.status===s);
+      const pct = cons.length ? Math.round(items.length/cons.length*100) : 0;
+      return [s, items.length, pct+'%'];
+    });
+    out.innerHTML = buildTable(['Status','Quantidade','% do Total'],
+      rows.map(r=>[`<span class="badge badge-${r[0].toLowerCase()}">${r[0]}</span>`, r[1], r[2]]));
+  }
+  else if (type === 'pacientes_top') {
+    const rows = pacs.map(p => {
+      const pc = cons.filter(c=>c.id_paciente===p.id);
+      return {nome:p.nome, cpf:p.cpf, total:pc.length, realizadas:pc.filter(c=>c.status==='REALIZADA').length};
+    }).sort((a,b)=>b.total-a.total).slice(0,10);
+    out.innerHTML = buildTable(['Paciente','CPF','Total Consultas','Realizadas'],
+      rows.map(r=>[r.nome, `<code class="inline-code">${r.cpf}</code>`, r.total, r.realizadas]));
+  }
+  else if (type === 'medicos_perf') {
+    const rows = meds.map(m => {
+      const mc  = cons.filter(c=>c.id_medico===m.id);
+      const rea = mc.filter(c=>c.status==='REALIZADA').length;
+      const can = mc.filter(c=>c.status==='CANCELADA').length;
+      const age = mc.filter(c=>c.status==='AGENDADA').length;
+      return {nome:m.nome, esp:getEsp(m.id_especialidade).nome||'—', total:mc.length, rea, can, age};
+    }).sort((a,b)=>b.total-a.total);
+    out.innerHTML = buildTable(['Médico','Especialidade','Total','Realizadas','Agendadas','Canceladas'],
+      rows.map(r=>[r.nome,r.esp,r.total,r.rea,r.age,r.can]));
+  }
+  else if (type === 'convenios') {
+    const convs = DB.get('convenios')||[];
+    if (!convs.length) { out.innerHTML = '<div class="empty empty-large"><div class="empty-icon">🏷️</div><p>Nenhum convênio cadastrado ainda.</p></div>'; return; }
+    const rows = convs.map(cv => {
+      const p = getPac(cv.id_paciente);
+      const sit = cv.validade && new Date(cv.validade) >= new Date() ? 'VÁLIDO' : 'VENCIDO';
+      return [p.nome||'—', cv.operadora, cv.plano||'—', cv.numero_carteirinha, fmtDate(cv.validade),
+        `<span class="badge ${sit==='VÁLIDO'?'badge-realizada':'badge-cancelada'}">${sit}</span>`];
+    });
+    out.innerHTML = buildTable(['Paciente','Operadora','Plano','Carteirinha','Validade','Situação'], rows);
+  }
+  else if (type === 'proximas') {
+    const rows = cons.filter(c=>c.status==='AGENDADA').sort((a,b)=>a.data_consulta.localeCompare(b.data_consulta));
+    if (!rows.length) { out.innerHTML = '<div class="empty empty-large"><div class="empty-icon">📅</div><p>Nenhuma consulta agendada.</p></div>'; return; }
+    out.innerHTML = buildTable(['Paciente','Médico','Data','Hora','Motivo','Valor'],
+      rows.map(c=>{
+        const p=getPac(c.id_paciente); const m=getMed(c.id_medico);
+        return [p.nome||'—', m.nome||'—', fmtDate(c.data_consulta),
+          `<code class="inline-code">${c.hora_consulta}</code>`,
+          c.motivo||'—', fmtMoney(c.valor)];
+      }));
+  }
+}
+
+function buildTable(headers, rows) {
+  return `<div class="card-body"><table>
+    <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.length ? rows.map(r=>`<tr>${r.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')
+      : `<tr><td colspan="${headers.length}"><div class="empty"><p>Sem dados para exibir</p></div></td></tr>`}
+    </tbody>
+  </table></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+function init() {
+  seed();
+  $('hdr-date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  $('btn-new').style.display = 'none'; // dashboard has no new btn
+  populateEspFilters();
+  renderDashboard();
+}
+
+// ═══════════════════════════════════════════════════
+//  ADMINISTRAÇÃO — Gestão de Dados
+// ═══════════════════════════════════════════════════
+function atualizarInfoAdmin() {
+  $('info-pacs').textContent = DB.get('pacientes').length;
+  $('info-meds').textContent = DB.get('medicos').length;
+  $('info-esps').textContent = DB.get('especialidades').length;
+  $('info-cons').textContent = DB.get('consultas').length;
+  $('info-pros').textContent = DB.get('prontuarios').length;
+  
+  // Calcular tamanho localStorage
+  let total = 0;
+  for (let key in localStorage) {
+    if (localStorage.hasOwnProperty(key)) {
+      total += localStorage[key].length + key.length;
+    }
+  }
+  $('info-size').textContent = (total / 1024).toFixed(2);
+}
+
+function exportarDados() {
+  const dados = {
+    pacientes:      DB.get('pacientes'),
+    medicos:        DB.get('medicos'),
+    especialidades: DB.get('especialidades'),
+    consultas:      DB.get('consultas'),
+    prontuarios:    DB.get('prontuarios'),
+    exportData:     new Date().toLocaleString('pt-BR'),
+    versao:         'ClinicaDB v1.0'
+  };
+  
+  const blob = new Blob([JSON.stringify(dados, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `clinicadb-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Dados exportados com sucesso! ✅');
+}
+
+function importarDados(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const dados = JSON.parse(e.target.result);
+      
+      if (!dados.pacientes || !dados.medicos) {
+        toast('Arquivo inválido! Falta dados esperados.', 'error');
+        return;
+      }
+      
+      // Restaurar dados
+      DB.set('pacientes', dados.pacientes);
+      DB.set('medicos', dados.medicos);
+      DB.set('especialidades', dados.especialidades || []);
+      DB.set('consultas', dados.consultas || []);
+      DB.set('prontuarios', dados.prontuarios || []);
+      
+      // Atualizar sequências de ID
+      if (dados.pacientes.length) localStorage.setItem('pacientes_seq', Math.max(...dados.pacientes.map(p=>p.id)));
+      if (dados.medicos.length) localStorage.setItem('medicos_seq', Math.max(...dados.medicos.map(m=>m.id)));
+      if (dados.especialidades.length) localStorage.setItem('especialidades_seq', Math.max(...dados.especialidades.map(e=>e.id)));
+      if (dados.consultas.length) localStorage.setItem('consultas_seq', Math.max(...dados.consultas.map(c=>c.id)));
+      if (dados.prontuarios.length) localStorage.setItem('prontuarios_seq', Math.max(...dados.prontuarios.map(p=>p.id)));
+      
+      atualizarInfoAdmin();
+      toast('Dados importados com sucesso! ✅');
+      closeModal('modal-admin');
+      renderPage(currentPage);
+      
+    } catch (err) {
+      toast('Erro ao importar arquivo: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  
+  // Limpar input file
+  event.target.value = '';
+}
+
+function limparTodosDados() {
+  if (!confirm('⚠️ TEM CERTEZA?\n\nIsso vai APAGAR todos os dados!\n\nEscreva "DELETAR" para confirmar.')) return;
+  
+  const resposta = prompt('Para confirmar, digite: DELETAR');
+  if (resposta !== 'DELETAR') {
+    toast('Operação cancelada.', 'error');
+    return;
+  }
+  
+  // Limpar localStorage
+  const keysToDelete = [];
+  for (let key in localStorage) {
+    if (key.startsWith('pacientes') || key.startsWith('medicos') || key.startsWith('especialidades') 
+      || key.startsWith('consultas') || key.startsWith('prontuarios') || key === 'seeded') {
+      keysToDelete.push(key);
+    }
+  }
+  keysToDelete.forEach(key => localStorage.removeItem(key));
+  
+  // Reinicializar com seed
+  seed();
+  atualizarInfoAdmin();
+  toast('Todos os dados foram resetados! Sistema retomado ao estado inicial.', 'success');
+  renderPage('dashboard');
+}
+
+$('btn-admin').addEventListener('click', () => {
+  atualizarInfoAdmin();
+  openModal('modal-admin');
+});
+
+init();
+</script>
+</body>
+</html>

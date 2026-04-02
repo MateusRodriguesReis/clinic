@@ -1,0 +1,235 @@
+:root {
+  --blue:       #1a73e8;
+  --blue-dark:  #1558b0;
+  --blue-light: #e8f0fe;
+  --teal:       #00897b;
+  --red:        #e53935;
+  --green:      #2e7d32;
+  --gray-50:    #f8fafc;
+  --gray-100:   #f1f5f9;
+  --gray-200:   #e2e8f0;
+  --gray-400:   #94a3b8;
+  --gray-600:   #475569;
+  --gray-800:   #1e293b;
+  --white:      #ffffff;
+  --shadow:     0 4px 24px rgba(0,0,0,.10);
+  --radius:     12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--gray-100);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrapper {
+  display: flex;
+  width: 900px;
+  min-height: 560px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.15);
+  background: white;
+}
+
+.panel-left {
+  width: 380px;
+  background: linear-gradient(145deg, #1558b0 0%, #1a73e8 50%, #00897b 100%);
+  padding: 52px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.panel-left::before {
+  content: '';
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  top: -80px; right: -80px;
+}
+
+.panel-left::after {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+  bottom: -40px; left: -40px;
+}
+
+.brand { position: relative; z-index: 1; }
+.brand-logo { font-size: 36px; margin-bottom: 12px; }
+.brand h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+.brand p  { font-size: 14px; opacity: .75; line-height: 1.5; }
+
+.features { position: relative; z-index: 1; }
+.feature-item { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.feature-icon { width: 38px; height: 38px; background: rgba(255,255,255,.15); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.feature-text h4 { font-size: 13.5px; font-weight: 600; }
+.feature-text p  { font-size: 12px; opacity: .65; margin-top: 1px; }
+.panel-footer { position: relative; z-index: 1; font-size: 12px; opacity: .5; }
+
+.panel-right {
+  flex: 1;
+  padding: 48px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.tabs {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 32px;
+}
+.tab {
+  flex: 1; text-align: center; padding: 9px 0; border-radius: 7px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  color: var(--gray-400); transition: all .2s;
+}
+.tab.active { background: white; color: var(--gray-800); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+.form-section { display: none; }
+.form-section.active { display: block; }
+.form-title { font-size: 22px; font-weight: 800; color: var(--gray-800); margin-bottom: 6px; }
+.form-sub   { font-size: 13.5px; color: var(--gray-400); margin-bottom: 28px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid .full { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 12px; font-weight: 700; color: var(--gray-600);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.form-group.margin-bottom-14 {
+  margin-bottom: 14px;
+}
+.input-wrap { position: relative; }
+.input-wrap .input-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 16px; pointer-events: none; color: var(--gray-400);
+}
+.input-wrap input {
+  width: 100%; padding: 11px 12px 11px 38px;
+  border: 1.5px solid var(--gray-200); border-radius: 9px;
+  font-size: 14px; font-family: inherit; outline: none;
+  background: var(--gray-50); transition: border .15s, background .15s;
+}
+.input-wrap input:focus { border-color: var(--blue); background: white; }
+.input-wrap input.error { border-color: var(--red); }
+.input-wrap .toggle-pw {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; font-size: 16px; color: var(--gray-400); user-select: none;
+}
+.field-error { font-size: 12px; color: var(--red); display: none; margin-top: 3px; }
+.field-error.show { display: block; }
+
+.sex-group { display: flex; gap: 8px; }
+.sex-opt { flex: 1; text-align: center; padding: 9px 0; border: 1.5px solid var(--gray-200);
+  border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--gray-400);
+  transition: all .15s; }
+.sex-opt.sel { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 22px 0; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+.divider span { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
+
+.admin-link {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px; border: 1.5px solid var(--gray-200); border-radius: 9px;
+  font-size: 13.5px; font-weight: 600; color: var(--gray-600); cursor: pointer;
+  text-decoration: none; transition: all .15s;
+}
+.admin-link:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+.btn-submit {
+  width: 100%; padding: 13px; background: var(--blue); color: white;
+  border: none; border-radius: 9px; font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-top: 22px; transition: background .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:hover { background: var(--blue-dark); }
+.btn-submit:disabled { background: var(--gray-400); cursor: not-allowed; }
+
+.alert {
+  padding: 12px 14px; border-radius: 9px; font-size: 13.5px; font-weight: 500;
+  display: none; margin-bottom: 18px; align-items: center; gap: 8px;
+}
+.alert.show { display: flex; }
+.alert.error   { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+.alert.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+
+.input-wrap select {
+  width: 100%; padding: 11px 12px 11px 38px;
+  border: 1.5px solid var(--gray-200); border-radius: 9px;
+  font-size: 14px; font-family: inherit; outline: none;
+  background: var(--gray-50); transition: border .15s; cursor: pointer; appearance: none;
+}
+.input-wrap select:focus { border-color: var(--blue); background: white; }
+
+.strength-bar { height: 4px; border-radius: 2px; background: var(--gray-200); margin-top: 6px; overflow: hidden; }
+.strength-fill { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0; }
+
+@media (max-width: 700px) {
+  .wrapper { flex-direction: column; width: 100%; min-height: 100vh; border-radius: 0; }
+  .panel-left { width: 100%; padding: 32px 28px; min-height: 160px; }
+  .features { display: none; }
+  .panel-right { padding: 32px 28px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .full { grid-column: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ── LEFT ── -->
+  <div class="panel-left">
+    <div class="brand">
+      <div class="brand-logo">🏥</div>
+      <h1>ClínicaDB</h1>
+      <p>Portal do Médico — Gerencie seus pacientes e consultas com facilidade.</p>
+    </div>
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">📅</div>
+        <div class="feature-text"><h4>Agende Consultas</h4><p>Organize sua agenda de forma prática</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📋</div>
+        <div class="feature-text"><h4>Gerencie Pacientes</h4><p>Acesse informações e históricos médicos</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-text"><h4>Seguro e Privado</h4><p>Seus dados estão protegidos</p></div>
+      </div>
+    </div>
+    <div class="panel-footer">ClínicaDB · Projeto Portfólio · Oracle SQL + JS</div>
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="panel-right">
+    <h2>Bem-vindo, Doutor!</h2>
+    <p>Gerencie seus pacientes, consultas e prontuários de forma eficiente e segura.</p>
+    <button>Entrar no Sistema</button>
+  </div>
+
+</div>
+
+</body>
+</html>  </attachment>  <attachment id=
